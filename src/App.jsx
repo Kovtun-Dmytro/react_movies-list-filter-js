@@ -6,17 +6,18 @@ import moviesFromServer from './api/movies.json';
 export const App = () => {
   const [query, setQuery] = useState('');
 
-  const handleQueryChange = e => {
-    const value = e.target.value.trim();
-
-    setQuery(value);
+  const handleQueryChange = event => {
+    setQuery(event.target.value.trimStart()); // зберігаємо без початкових пробілів
   };
 
-  const filteredMovies = query.trim()
-    ? moviesFromServer.filter(
-      movie => movie.title.toLowerCase() === query.trim().toLowerCase(),
-    )
-    : moviesFromServer;
+  const visibleMovies = moviesFromServer.filter(movie => {
+    const lowerQuery = query.trim().toLowerCase();
+
+    return (
+      movie.title.toLowerCase().includes(lowerQuery) ||
+      movie.description.toLowerCase().includes(lowerQuery)
+    );
+  });
 
   return (
     <div className="page">
@@ -34,13 +35,14 @@ export const App = () => {
                 id="search-query"
                 className="input"
                 placeholder="Type search word"
-                onChange={handleQueryChange}
                 value={query}
+                onChange={handleQueryChange}
               />
             </div>
           </div>
         </div>
-        <MoviesList movies={filteredMovies} /> {}
+
+        <MoviesList movies={visibleMovies} />
       </div>
 
       <div className="sidebar">Sidebar goes here</div>
